@@ -6,10 +6,12 @@ from typing import Annotated
 from sqlmodel import Session
 from .database_sql import engine
 from .models import Student
+from hashlib import md5
 
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 EXPIRE_MINUTES = 720
+PASSWORD_SALT = "ABC"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
 
 
@@ -42,3 +44,9 @@ def get_jwt_user(token: Annotated[str, Depends(oauth2_scheme)]):
         raise credentials_exception
 
     return user
+
+
+def hash_password(password: str):
+    password += PASSWORD_SALT
+    hashed = md5(password.encode())
+    return hashed.hexdigest()

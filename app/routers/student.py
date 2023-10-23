@@ -3,28 +3,37 @@ from sqlmodel import Session, select
 from fastapi.responses import JSONResponse
 from typing import Annotated
 from ..database_sql import engine
-from ..Oauth2 import get_jwt_user
-from ..models import StudentOut, Student
+from ..Oauth2 import get_jwt_user, hash_password
+from ..models import Student
+from ..serializers import StudentOut
 
 
-router = APIRouter(
+
+student_router = APIRouter(
     prefix="/student",
     tags=['Students']
 )
 
 # , auth: Annotated[StudentOut, Depends(get_jwt_user)]
-@router.get('/{id}', response_model=StudentOut)
-def get_student(id: int):
+@student_router.get('/{id}', response_model=StudentOut, )
+def get_student(id: int, auth: Annotated[StudentOut, Depends(get_jwt_user)]):
     with Session(engine) as session:
         return session.exec(select(Student).where(Student.id == id)).one()
 
 
 
-@router.post('/')
-def register_student(user: StudentOut):
+@student_router.post('/')
+def register_student(user: StudentOut, auth: Annotated[StudentOut, Depends(get_jwt_user)]):
     try:
         new_user = Student(**user.dict())
+        new_user.password = hash_password(new_user.password)
+        
         with Session(engine) as session:
+
+            should_be_none = session.exec(select(Student).where(Student.email == new_user.email)).first()
+            if should_be_none is not None:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Wrong Credentials")
+                
             session.add(new_user)
             session.commit()
     except:
@@ -33,8 +42,8 @@ def register_student(user: StudentOut):
     return JSONResponse(content="Student was registered successfully", status_code=status.HTTP_201_CREATED)
 
 
-@router.put('/{id}')
-def reform_student(id: int, updated_student: StudentOut):
+@student_router.put('/{id}')
+def reform_student(id: int, updated_student: StudentOut, auth: Annotated[StudentOut, Depends(get_jwt_user)]):
     try:
         with Session(engine) as session:
             db_user = session.get(Student, id)
@@ -53,4 +62,4 @@ def reform_student(id: int, updated_student: StudentOut):
             return db_user
 
     except:
-        pass
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
