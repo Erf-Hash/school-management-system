@@ -1,17 +1,20 @@
+from dotenv import dotenv_values
 from jose import jwt, JWTError
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException, status
 from datetime import datetime, timedelta
 from typing import Annotated
 from sqlmodel import Session
+from hashlib import md5
 from .database_sql import engine
 from .models import Student
-from hashlib import md5
 
 
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-EXPIRE_MINUTES = 720
-PASSWORD_SALT = "ABC"
+ENV = dict(dotenv_values(dotenv_path="./environment_variables.env"))
+SECRET_KEY = ENV['SECRET_KEY']
+EXPIRE_MINUTES = int(ENV['EXPIRE_MINUTES'])
+PASSWORD_SALT = ENV["PASSWORD_SALT"]
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
 
 

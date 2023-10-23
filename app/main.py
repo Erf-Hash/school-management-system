@@ -1,3 +1,4 @@
+from dotenv import dotenv_values
 from fastapi import FastAPI
 from .models import SQLModel
 from .database_sql import engine
@@ -8,8 +9,9 @@ from .routers.classes import classes_router
 from .routers.home import home_router
 
 
-SQLModel.metadata.create_all(bind=engine)
 
+
+SQLModel.metadata.create_all(bind=engine)
 
 app = FastAPI(redoc_url=None)
 
