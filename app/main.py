@@ -1,6 +1,6 @@
 from dotenv import dotenv_values
 from fastapi import FastAPI
-from .models import SQLModel
+from .models.models_student import SQLModel
 from .database_sql import engine
 from .middleware import block_unknown_ip_addresses
 from .exceptions import not_found

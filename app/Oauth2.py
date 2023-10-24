@@ -7,7 +7,7 @@ from typing import Annotated
 from sqlmodel import Session
 from hashlib import md5
 from .database_sql import engine
-from .models import Student
+from .models.models_student import Student
 
 
 ENV = dict(dotenv_values(dotenv_path="./environment_variables.env"))
@@ -33,7 +33,7 @@ def get_jwt_user(token: Annotated[str, Depends(oauth2_scheme)]):
     )
     try:
         payload = jwt.decode(token, SECRET_KEY)
-        user_id: str = payload.get("sub")
+        user_id: str = payload.get('user_id')
         if user_id is None:
             raise credentials_exception
 

@@ -4,8 +4,8 @@ from fastapi.responses import JSONResponse
 from typing import Annotated
 from ..database_sql import engine
 from ..Oauth2 import get_jwt_user, hash_password
-from ..models import Student
-from ..serializers import StudentOut
+from ..models.models_student import Student
+from ..serializers.serializers_student import StudentOut
 
 
 
@@ -23,7 +23,7 @@ def get_student(id: int, auth: Annotated[StudentOut, Depends(get_jwt_user)]):
 
 
 @student_router.post('/')
-def register_student(user: StudentOut, auth: Annotated[StudentOut, Depends(get_jwt_user)]):
+def register_student(user: StudentOut):
     try:
         new_user = Student(**user.dict())
         new_user.password = hash_password(new_user.password)

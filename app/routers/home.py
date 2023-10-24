@@ -4,7 +4,7 @@ from fastapi.responses import HTMLResponse
 from typing import Annotated
 from sqlmodel import Session, select
 from ..database_sql import engine
-from ..models import Student
+from ..models.models_student import Student
 from ..Oauth2 import hash_password, create_jwt
 
 home_router = APIRouter()
