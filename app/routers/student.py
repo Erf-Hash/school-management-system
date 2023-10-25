@@ -12,7 +12,7 @@ from ..serializers.serializers_student import StudentOut
 student_router = APIRouter(
     prefix="/student",
     tags=['Students']
-)
+)   
 
 # , auth: Annotated[StudentOut, Depends(get_jwt_user)]
 @student_router.get('/{id}', response_model=StudentOut, )
@@ -63,3 +63,17 @@ def reform_student(id: int, updated_student: StudentOut, auth: Annotated[Student
 
     except:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    
+
+@student_router.delete('/{id}')
+def delete_student(id: int, auth: Annotated[StudentOut, Depends(get_jwt_user)]):
+    with Session(engine) as session:
+        to_be_deleted = session.get(Student, id)
+
+        if not to_be_deleted:
+            raise HTTPException(status_code=404, detail="Student not found")
+        
+        session.delete(to_be_deleted)
+        session.commit()
+
+    return JSONResponse(content="Student was deleted successfully", status_code=status.HTTP_200_OK)

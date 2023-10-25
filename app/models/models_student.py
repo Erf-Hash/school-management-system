@@ -49,3 +49,12 @@ class Student(SQLModel, table=True):
         back_populates="students", link_model=StudentClassLink
     )
 
+    
+class Staff(SQLModel, table=True):
+    id: Optional[int] = Field(primary_key=True, default=None)
+    first_name: str
+    last_name: str
+    password: str
+    email: EmailStr
+    role: Role
+
